@@ -26,8 +26,7 @@ setup(
     platforms='any',
     install_requires=[
         'flask',
-        'consulate',
-        'yaml',
+        'consulate==0.4.0',
     ],
     test_suite='tests',
     tests_require = [
