@@ -32,6 +32,7 @@ setup(
     test_suite='tests',
     tests_require = [
         'flask-testing',
+        'httpretty',
     ],
     classifiers=[
         'Environment :: Web Environment',

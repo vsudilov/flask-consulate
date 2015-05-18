@@ -39,7 +39,7 @@ class Consul(object):
         elsewhere.
 
         :param namespace: kv namespace/directory. Defaults to
-         DEFAULT_KV_NAMESPACE
+                DEFAULT_KV_NAMESPACE
         :return: None
         """
 
