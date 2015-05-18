@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/adsabs/flask-consulate.svg?branch=master)](https://travis-ci.org/adsabs/flask-consulate)
+
 Flask-consulate
 ===
 
