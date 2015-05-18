@@ -25,8 +25,10 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'flask',
+        'Flask',
         'consulate==0.4.0',
+        'requests',
+        'pyyaml',
     ],
     test_suite='tests',
     tests_require = [

@@ -1,2 +1,6 @@
 consulate==0.4.0
-flask
+Flask
+requests
+pyyaml
+httpretty
+flask-testing
