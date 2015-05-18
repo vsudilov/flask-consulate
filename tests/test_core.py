@@ -2,7 +2,6 @@ import unittest
 from flask import Flask
 from flask.ext.testing import TestCase
 import httpretty
-from requests.exceptions import ConnectionError
 try:
     from flask.ext.consulate import Consul
 except ImportError:
