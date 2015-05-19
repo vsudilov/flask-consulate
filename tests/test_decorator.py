@@ -2,11 +2,12 @@ import unittest
 import httpretty
 import requests
 try:
-    from flask.ext.consulate import with_retry_connections
+    from flask.ext.consulate import with_retry_connections, \
+        ConsulConnectionError
 except ImportError:
     import sys
     sys.path.append('..')
-    from flask_consulate import with_retry_connections
+    from flask_consulate import with_retry_connections, ConsulConnectionError
 
 
 class TestDecorator(unittest.TestCase):
@@ -46,8 +47,28 @@ class TestDecorator(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.text, "OK")
 
+    def test_failing_retry_connections(self):
+        """
+        Test that the proper exception is raised after retrying and failing
+        after 3 times
+        """
+        urls = (
+            url for url in ['http://fake', 'http://fake', 'http://fake']
+        )
+
+        @with_retry_connections()
+        def GET_request(urls):
+            """
+            This function will attempt to contact 3 urls: the first two
+            should intentionally cause a ConnectionError, and the third
+            will be caught by httpretty and serve a valid response
+            """
+            u = urls.next()
+            return requests.get(u)
+
+        with self.assertRaises(ConsulConnectionError):
+            GET_request(urls)
 
 
 if __name__ == '__main__':
     unittest.main()
-

@@ -9,6 +9,9 @@ DEFAULT_KV_NAMESPACE = "config/{service}/{environment}/".format(
     environment=os.environ.get('ENVIRONMENT', 'generic_environment')
 )
 
+class ConsulConnectionError(ConnectionError):
+    """A connection error related to Consul occured"""
+
 
 def with_retry_connections(max_tries=3, sleep=0.05):
     """
@@ -28,7 +31,7 @@ def with_retry_connections(max_tries=3, sleep=0.05):
                 except ConnectionError:
                     tries += 1
                     if tries >= max_tries:
-                        raise
+                        raise ConsulConnectionError
                     if sleep:
                         time.sleep(sleep)
         return f_retry
