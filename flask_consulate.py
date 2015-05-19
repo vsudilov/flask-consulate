@@ -103,10 +103,8 @@ class Consul(object):
         if namespace is None:
             namespace = DEFAULT_KV_NAMESPACE
         for k, v in self.session.kv.find(namespace).iteritems():
-            # Use yaml.load() instead of json.loads() since we want want to
-            # load non-strict json
             k = k.replace(namespace, '')
-            self.app.config[k] = yaml.load(v)
+            self.app.config[k] = v
             msg = "Set {k}={v} from consul kv '{ns}'".format(
                 k=k,
                 v=v,
