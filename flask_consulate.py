@@ -3,10 +3,6 @@ import consulate
 import time
 from requests.exceptions import ConnectionError
 
-DEFAULT_KV_NAMESPACE = "config/{service}/{environment}/".format(
-    service=os.environ.get('SERVICE', 'generic_service'),
-    environment=os.environ.get('ENVIRONMENT', 'generic_environment')
-)
 
 class ConsulConnectionError(ConnectionError):
     """A connection error related to Consul occured"""
@@ -106,7 +102,11 @@ class Consul(object):
         """
 
         if namespace is None:
-            namespace = DEFAULT_KV_NAMESPACE
+            namespace = "config/{service}/{environment}/".format(
+                service=os.environ.get('SERVICE', 'generic_service'),
+                environment=os.environ.get('ENVIRONMENT', 'generic_environment')
+            )
+
         for k, v in self.session.kv.find(namespace).iteritems():
             k = k.replace(namespace, '')
             self.app.config[k] = v
