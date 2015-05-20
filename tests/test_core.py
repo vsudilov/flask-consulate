@@ -30,7 +30,7 @@ class TestFlaskConsulate(TestCase):
             body="localhost:8300",
         )
 
-        self.consul = Consul()
+        self.consul = Consul(test_connection=True)
         self.consul.init_app(app)
         return app
 

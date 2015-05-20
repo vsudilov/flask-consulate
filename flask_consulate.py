@@ -73,18 +73,24 @@ class Consul(object):
         self.host = self.kwargs.get('consul_host') or \
             os.environ.get('CONSUL_HOST', 'localhost')
         self.max_tries = self.kwargs.get('max_tries', 3)
-        self.session = self._create_session()
+        self.session = self._create_session(
+            test_connection=self.kwargs.get('test_connection', False),
+        )
 
     @with_retry_connections()
-    def _create_session(self):
+    def _create_session(self, test_connection=False):
         """
         Create a consulate.session object, and query for its leader to ensure
         that the connection is made.
 
+        :param test_connection: call .leader() to ensure that the connection
+            is valid
+        :type test_connection: bool
         :return consulate.Session instance
         """
         session = consulate.Session(host=self.host)
-        session.status.leader()
+        if test_connection:
+            session.status.leader()
         return session
 
     @with_retry_connections()
