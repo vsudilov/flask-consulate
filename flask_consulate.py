@@ -1,4 +1,3 @@
-import yaml
 import os
 import consulate
 import time
@@ -28,10 +27,10 @@ def with_retry_connections(max_tries=3, sleep=0.05):
             while 1:
                 try:
                     return f(*args, **kwargs)
-                except ConnectionError:
+                except ConnectionError, e:
                     tries += 1
                     if tries >= max_tries:
-                        raise ConsulConnectionError
+                        raise ConsulConnectionError(e)
                     if sleep:
                         time.sleep(sleep)
         return f_retry
