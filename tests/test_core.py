@@ -2,7 +2,7 @@ import unittest
 from flask import Flask
 import httpretty
 
-from flask.ext.consulate import Consul
+from flask.ext.consulate import Consul, ConsulConnectionError
 
 
 class TestFlaskConsulate(unittest.TestCase):
@@ -37,11 +37,11 @@ class TestFlaskConsulate(unittest.TestCase):
         self.assertIn('consul', app.extensions)
         self.assertEqual(consul, app.extensions['consul'])
 
-    @httpretty.activate
     def test_session(self):
         """
         Ensures that the session has the expected connectivity
         """
+        httpretty.enable()
 
         httpretty.register_uri(
             httpretty.GET,
@@ -49,7 +49,17 @@ class TestFlaskConsulate(unittest.TestCase):
             body="localhost:8300",
         )
         app = self.create_app()
-        Consul(app, test_connection=True)
+        consul = Consul(app, test_connection=True)
+        self.assertIsNotNone(consul)
+
+        httpretty.disable()
+        httpretty.reset()
+
+        app = self.create_app()
+        self.assertRaises(
+            ConsulConnectionError,
+            lambda: Consul(app, test_connection=True),
+        )
 
 
 if __name__ == '__main__':
