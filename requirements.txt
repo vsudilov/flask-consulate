@@ -2,4 +2,3 @@ consulate==0.4.0
 Flask
 requests
 httpretty
-flask-testing
