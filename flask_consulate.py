@@ -1,9 +1,13 @@
 import os
 import consulate
 import time
-from requests.exceptions import ConnectionError
-import netifaces
+from collections import OrderedDict
+import requests
+from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
+import random
+from urlparse import urljoin
+import netifaces
 
 
 class ConsulConnectionError(ConnectionError):
@@ -25,7 +29,7 @@ def with_retry_connections(max_tries=3, sleep=0.05):
             while 1:
                 try:
                     return f(*args, **kwargs)
-                except ConnectionError, e:
+                except (ConnectionError, ConnectTimeout), e:
                     tries += 1
                     if tries >= max_tries:
                         raise ConsulConnectionError(e)
@@ -124,25 +128,24 @@ class ConsulService:
     """
     Container for a consul service record
     """
-
     def __init__(self, service_uri, discover_ns=True):
         """
         :param service_uri: string formatted service identifier
             (consul://production.solr_service.consul)
-        :param discover_ns: Attempt to auto-discover DNS nameservers
+        :param discover_ns: Attempt to connect to a DNS server that is bound to
+            a local network interface
         """
         assert service_uri.startswith('consul://'), "Invalid consul service URI"
         self.service_uri = service_uri
         self.service = service_uri.replace('consul://', '')
-        self.endpoints = None
+        self.endpoints = []
         self.resolver = Resolver()
         if discover_ns:
             self.set_ns()
 
     def set_ns(self, iface='docker0'):
         """
-        set the nameserver ip address from the network interface ip addr. If
-        kwarg `ip` is specified, use that instead
+        set the nameserver ip address from the network interface ip addr.
         :param iface: network inferace
         """
         assert iface in netifaces.interfaces(), \
@@ -151,7 +154,7 @@ class ConsulService:
             netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
         ]
 
-    def resolve(self):
+    def _resolve(self):
         """
         Query the consul DNS server for the service IP and port
         """
@@ -164,7 +167,6 @@ class ConsulService:
         for rec in r.response.answer[0].items:
             name = '.'.join(rec.target.labels)
             endpoints[name]['port'] = rec.port
-
         self.endpoints = [
             "http://{ip}:{port}".format(
                 ip=v['addr'], port=v['port']
@@ -172,4 +174,44 @@ class ConsulService:
         ]
         return self.endpoints
 
-    
+    @property
+    def base_url(self):
+        """
+        get a random endpoint from self.endpointsget a random endpoint from
+        self.endpoints
+        """
+        return random.choice(self._resolve())
+
+    @with_retry_connections()
+    def request(self, method, endpoint, **kwargs):
+        """
+        Proxy to requests.request
+        :param method:
+        :param endpoint:
+        :param kwargs: kwargs passed directly to requests.request
+        :return:
+        """
+        kwargs.setdefault('timeout', (1, 30))
+        return requests.request(
+            method,
+            urljoin(self.base_url, endpoint),
+            **kwargs
+        )
+
+    def get(self, endpoint, **kwargs):
+        return self.request('GET', endpoint, **kwargs)
+
+    def post(self, endpoint, **kwargs):
+        return self.request('POST', endpoint, **kwargs)
+
+    def delete(self, endpoint, **kwargs):
+        return self.request('DELETE', endpoint, **kwargs)
+
+    def put(self, endpoint, **kwargs):
+        return self.request('PUT', endpoint, **kwargs)
+
+    def options(self, endpoint, **kwargs):
+        return self.request('OPTIONS', endpoint, **kwargs)
+
+    def head(self, endpoint, **kwargs):
+        return self.request('HEAD', endpoint, **kwargs)
