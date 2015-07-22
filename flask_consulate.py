@@ -2,6 +2,8 @@ import os
 import consulate
 import time
 from requests.exceptions import ConnectionError
+import netifaces
+from dns.resolver import Resolver
 
 
 class ConsulConnectionError(ConnectionError):
@@ -116,3 +118,58 @@ class Consul(object):
                 ns=namespace,
             )
             self.app.logger.debug(msg)
+
+
+class ConsulService:
+    """
+    Container for a consul service record
+    """
+
+    def __init__(self, service_uri, discover_ns=True):
+        """
+        :param service_uri: string formatted service identifier
+            (consul://production.solr_service.consul)
+        :param discover_ns: Attempt to auto-discover DNS nameservers
+        """
+        assert service_uri.startswith('consul://'), "Invalid consul service URI"
+        self.service_uri = service_uri
+        self.service = service_uri.replace('consul://', '')
+        self.endpoints = None
+        self.resolver = Resolver()
+        if discover_ns:
+            self.set_ns()
+
+    def set_ns(self, iface='docker0'):
+        """
+        set the nameserver ip address from the network interface ip addr. If
+        kwarg `ip` is specified, use that instead
+        :param iface: network inferace
+        """
+        assert iface in netifaces.interfaces(), \
+            'Unknown iface {}'.format(iface)
+        self.resolver.nameservers = [
+            netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+        ]
+
+    def resolve(self):
+        """
+        Query the consul DNS server for the service IP and port
+        """
+        endpoints = {}
+        r = self.resolver.query(self.service, 'SRV')
+        for rec in r.response.additional:
+            name = rec.name.to_text()
+            addr = rec.items[0].address
+            endpoints[name] = {'addr': addr}
+        for rec in r.response.answer[0].items:
+            name = '.'.join(rec.target.labels)
+            endpoints[name]['port'] = rec.port
+
+        self.endpoints = [
+            "http://{ip}:{port}".format(
+                ip=v['addr'], port=v['port']
+            ) for v in endpoints.values()
+        ]
+        return self.endpoints
+
+    

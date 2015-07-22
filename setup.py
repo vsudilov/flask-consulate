@@ -29,6 +29,8 @@ setup(
         'consulate==0.4.0',
         'requests',
         'pyyaml',
+        'dnspython',
+        'netifaces',
     ],
     test_suite='tests',
     tests_require = [
