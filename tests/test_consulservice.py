@@ -42,3 +42,42 @@ class TestConsulService(TestCase):
         """
         pass
 
+    @mock.patch('flask.ext.consulate.ConsulService._resolve')
+    def test_baseurl(self, mocked):
+        """
+        the class property base_url should call _resolve() and return a random
+        element from that result list
+        """
+        mocked.return_value = ["addr-{}:80".format(i) for i in range(50)]
+        cs = ConsulService("consul://")
+        urls = [cs.base_url, cs.base_url, cs.base_url]
+        self.assertNotEqual(
+            urls,
+            set(urls),
+            msg="testing random.Choice here, which might cause this to break "
+                "a negligible fraction of the time"
+        )
+        for u in urls:
+            self.assertIn(u, mocked.return_value)
+        self.assertEqual(mocked.call_count, 3)
+
+    @mock.patch('flask.ext.consulate.requests.Session')
+    def test_request(self, mocked):
+        """
+        the ConsulService.request should be a thin wrapper around
+        requests
+        """
+        instance = mocked.return_value
+        with mock.patch('flask.ext.consulate.ConsulService._resolve') as r:
+            r.return_value = ["http://base_url:80/"]
+            cs = ConsulService("consul://")
+            cs.get('/v1/status')
+            instance.request.assert_called_with(
+                'GET',
+                'http://base_url:80/v1/status',
+                timeout=(1, 30),
+            )
+
+
+
+
