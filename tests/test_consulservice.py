@@ -49,7 +49,7 @@ class TestConsulService(TestCase):
         element from that result list
         """
         mocked.return_value = ["addr-{}:80".format(i) for i in range(50)]
-        cs = ConsulService("consul://")
+        cs = ConsulService("consul://", discover_ns=False)
         urls = [cs.base_url, cs.base_url, cs.base_url]
         self.assertNotEqual(
             urls,
@@ -70,7 +70,7 @@ class TestConsulService(TestCase):
         instance = mocked.return_value
         with mock.patch('flask.ext.consulate.ConsulService._resolve') as r:
             r.return_value = ["http://base_url:80/"]
-            cs = ConsulService("consul://")
+            cs = ConsulService("consul://", discover_ns=False)
             cs.get('/v1/status')
             instance.request.assert_called_with(
                 'GET',
