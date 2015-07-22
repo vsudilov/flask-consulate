@@ -131,12 +131,19 @@ class ConsulService(object):
         # Consul advertises a service called FOO that is reachable via two URIs:
         # http://10.1.1.1:8001 and http://10.1.1.2:8002
     cs = ConsulService("consul://tag.FOO.service")
+
         # returns a random choice from the DNS-advertised routes
         # in our case, either http://10.1.1.1:8001 or http://10.1.1.2:8002
     cs.base_url
+
         # send an http-get to base_url+'/v1/status', re-resolving and
         # re-retrying if that connection failed
     cs.get('/v1/status')
+
+        #Subsequent http requests will now have the "X-Added" header
+    cs.session.headers.update({"X-Added": "Value"})
+    cs.post('/v1/status')
+
         # Set the DNS nameserver to the IP bound to the interface `docker0`
         # This happens by default unless discover_ns=False is passed during
         # class initialization
@@ -154,6 +161,7 @@ class ConsulService(object):
         self.service = service_uri.replace('consul://', '')
         self.endpoints = []
         self.resolver = Resolver()
+        self.session = requests.Session()
         if discover_ns:
             self.set_ns()
 
@@ -206,7 +214,7 @@ class ConsulService(object):
         :return:
         """
         kwargs.setdefault('timeout', (1, 30))
-        return requests.request(
+        return self.session.request(
             method,
             urljoin(self.base_url, endpoint),
             **kwargs
