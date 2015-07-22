@@ -1,7 +1,6 @@
 import os
 import consulate
 import time
-from collections import OrderedDict
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
@@ -124,9 +123,24 @@ class Consul(object):
             self.app.logger.debug(msg)
 
 
-class ConsulService:
+class ConsulService(object):
     """
     Container for a consul service record
+    Example:
+
+        # Consul advertises a service called FOO that is reachable via two URIs:
+        # http://10.1.1.1:8001 and http://10.1.1.2:8002
+    cs = ConsulService("consul://tag.FOO.service")
+        # returns a random choice from the DNS-advertised routes
+        # in our case, either http://10.1.1.1:8001 or http://10.1.1.2:8002
+    cs.base_url
+        # send an http-get to base_url+'/v1/status', re-resolving and
+        # re-retrying if that connection failed
+    cs.get('/v1/status')
+        # Set the DNS nameserver to the IP bound to the interface `docker0`
+        # This happens by default unless discover_ns=False is passed during
+        # class initialization
+    cs.set_ns(iface='docker0')
     """
     def __init__(self, service_uri, discover_ns=True):
         """
