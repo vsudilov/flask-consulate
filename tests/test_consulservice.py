@@ -16,7 +16,7 @@ class TestConsulService(TestCase):
         """
         an initialized ConsulService object should parse the service URI
         """
-        cs = ConsulService('consul://tag.name.service', discover_ns=False)
+        cs = ConsulService('consul://tag.name.service')
         self.assertEqual(cs.service, 'tag.name.service')
 
     @mock.patch('flask.ext.consulate.netifaces')
@@ -29,10 +29,10 @@ class TestConsulService(TestCase):
         mocked.ifaddresses.return_value = {
             mocked.AF_INET: [{'addr': '192.168.1.1'}]
         }
-        cs = ConsulService('consul://')
+        cs = ConsulService('consul://', discover_ns='docker0')
         self.assertEqual(cs.resolver.nameservers, ['192.168.1.1'])
-        with self.assertRaisesRegexp(AssertionError, "Unknown iface eth1"):
-            cs.set_ns(iface='eth1')
+        with self.assertRaisesRegexp(AssertionError, "Unknown iface eth0"):
+            cs.set_ns(iface='eth0')
 
     @skip("!! Test not implemented !!")
     def test_resolve(self):
@@ -49,7 +49,7 @@ class TestConsulService(TestCase):
         element from that result list
         """
         mocked.return_value = ["addr-{}:80".format(i) for i in range(50)]
-        cs = ConsulService("consul://", discover_ns=False)
+        cs = ConsulService("consul://")
         urls = [cs.base_url, cs.base_url, cs.base_url]
         self.assertNotEqual(
             urls,
@@ -70,7 +70,7 @@ class TestConsulService(TestCase):
         instance = mocked.return_value
         with mock.patch('flask.ext.consulate.ConsulService._resolve') as r:
             r.return_value = ["http://base_url:80/"]
-            cs = ConsulService("consul://", discover_ns=False)
+            cs = ConsulService("consul://")
             cs.get('/v1/status')
             instance.request.assert_called_with(
                 'GET',

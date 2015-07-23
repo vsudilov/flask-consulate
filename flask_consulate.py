@@ -132,6 +132,10 @@ class ConsulService(object):
         # http://10.1.1.1:8001 and http://10.1.1.2:8002
     cs = ConsulService("consul://tag.FOO.service")
 
+        # Set the DNS nameserver to the IP address attached to network
+        #interface `docker0`
+    cs = ConsulService("consul://tag.FOO.server", discover_ns='docker0')
+
         # returns a random choice from the DNS-advertised routes
         # in our case, either http://10.1.1.1:8001 or http://10.1.1.2:8002
     cs.base_url
@@ -143,13 +147,8 @@ class ConsulService(object):
         #Subsequent http requests will now have the "X-Added" header
     cs.session.headers.update({"X-Added": "Value"})
     cs.post('/v1/status')
-
-        # Set the DNS nameserver to the IP bound to the interface `docker0`
-        # This happens by default unless discover_ns=False is passed during
-        # class initialization
-    cs.set_ns(iface='docker0')
     """
-    def __init__(self, service_uri, discover_ns=True):
+    def __init__(self, service_uri, discover_ns=None):
         """
         :param service_uri: string formatted service identifier
             (consul://production.solr_service.consul)
@@ -162,8 +161,8 @@ class ConsulService(object):
         self.endpoints = []
         self.resolver = Resolver()
         self.session = requests.Session()
-        if discover_ns:
-            self.set_ns()
+        if discover_ns is not None:
+            self.set_ns(iface=discover_ns)
 
     def set_ns(self, iface='docker0'):
         """
