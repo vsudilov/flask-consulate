@@ -1,5 +1,5 @@
 language: python
 python:
 - "2.7"
-script: "./setup.py test"
-
+script: "./setup.py install && ./setup.py test"
+sudo: false
