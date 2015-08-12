@@ -4,3 +4,6 @@ requests>=2.7.0
 httpretty
 dnspython
 netifaces
+flask-testing
+httpretty
+mock
