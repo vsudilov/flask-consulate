@@ -19,20 +19,6 @@ class TestConsulService(TestCase):
         cs = ConsulService('consul://tag.name.service')
         self.assertEqual(cs.service, 'tag.name.service')
 
-    @mock.patch('flask.ext.consulate.netifaces')
-    def test_set_ns(self, mocked):
-        """
-        set_ns() should set ConsulService.resolver.nameservers to the ip
-        associated with a specified network interface
-        """
-        mocked.interfaces.return_value = ['docker0']
-        mocked.ifaddresses.return_value = {
-            mocked.AF_INET: [{'addr': '192.168.1.1'}]
-        }
-        cs = ConsulService('consul://', discover_ns='docker0')
-        self.assertEqual(cs.resolver.nameservers, ['192.168.1.1'])
-        with self.assertRaisesRegexp(AssertionError, "Unknown iface eth0"):
-            cs.set_ns(iface='eth0')
 
     @skip("!! Test not implemented !!")
     def test_resolve(self):
@@ -42,24 +28,18 @@ class TestConsulService(TestCase):
         """
         pass
 
-    @mock.patch('flask.ext.consulate.ConsulService._resolve')
-    def test_baseurl(self, mocked):
+    def test_baseurl(self):
         """
-        the class property base_url should call _resolve() and return a random
+        the class property base_url should call _resolve() and return an
         element from that result list
         """
-        mocked.return_value = ["addr-{}:80".format(i) for i in range(50)]
         cs = ConsulService("consul://")
+        cs.endpoints = ("addr-{}:80".format(i) for i in range(50))
         urls = [cs.base_url, cs.base_url, cs.base_url]
-        self.assertNotEqual(
-            urls,
-            set(urls),
-            msg="testing random.Choice here, which might cause this to break "
-                "a negligible fraction of the time"
+        self.assertEquals(
+            ["addr-0:80", "addr-1:80", "addr-2:80"],
+            urls
         )
-        for u in urls:
-            self.assertIn(u, mocked.return_value)
-        self.assertEqual(mocked.call_count, 3)
 
     @mock.patch('flask.ext.consulate.requests.Session')
     def test_request(self, mocked):
@@ -68,15 +48,14 @@ class TestConsulService(TestCase):
         requests
         """
         instance = mocked.return_value
-        with mock.patch('flask.ext.consulate.ConsulService._resolve') as r:
-            r.return_value = ["http://base_url:80/"]
-            cs = ConsulService("consul://")
-            cs.get('/v1/status')
-            instance.request.assert_called_with(
-                'GET',
-                'http://base_url:80/v1/status',
-                timeout=(1, 30),
-            )
+        cs = ConsulService("consul://")
+        cs.endpoints = iter(("http://base_url:80/",))
+        cs.get('/v1/status')
+        instance.request.assert_called_with(
+            'GET',
+            'http://base_url:80/v1/status',
+            timeout=(1, 30),
+        )
 
 
 

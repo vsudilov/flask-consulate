@@ -2,7 +2,6 @@ consulate==0.4.0
 Flask
 requests>=2.7.0
 dnspython
-netifaces
 flask-testing
 httpretty
 mock

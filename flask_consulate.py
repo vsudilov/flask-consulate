@@ -4,10 +4,7 @@ import time
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
-import random
 from urlparse import urljoin
-import netifaces
-
 
 class ConsulConnectionError(ConnectionError):
     """A connection error related to Consul occured"""
@@ -148,32 +145,21 @@ class ConsulService(object):
     cs.session.headers.update({"X-Added": "Value"})
     cs.post('/v1/status')
     """
-    def __init__(self, service_uri, discover_ns=None):
+    def __init__(self, service_uri, nameservers=None):
         """
         :param service_uri: string formatted service identifier
             (consul://production.solr_service.consul)
-        :param discover_ns: Attempt to connect to a DNS server that is bound to
-            a local network interface
+        :param nameservers: use custom nameservers
+        :type nameservers: list
         """
         assert service_uri.startswith('consul://'), "Invalid consul service URI"
         self.service_uri = service_uri
         self.service = service_uri.replace('consul://', '')
-        self.endpoints = []
+        self.endpoints = iter(())
         self.resolver = Resolver()
         self.session = requests.Session()
-        if discover_ns is not None:
-            self.set_ns(iface=discover_ns)
-
-    def set_ns(self, iface='docker0'):
-        """
-        set the nameserver ip address from the network interface ip addr.
-        :param iface: network inferace
-        """
-        assert iface in netifaces.interfaces(), \
-            'Unknown iface {}'.format(iface)
-        self.resolver.nameservers = [
-            netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
-        ]
+        if nameservers is not None:
+            self.resolver.nameservers = nameservers
 
     def _resolve(self):
         """
@@ -188,27 +174,29 @@ class ConsulService(object):
         for rec in r.response.answer[0].items:
             name = '.'.join(rec.target.labels)
             endpoints[name]['port'] = rec.port
-        self.endpoints = [
+        self.endpoints = (
             "http://{ip}:{port}".format(
                 ip=v['addr'], port=v['port']
             ) for v in endpoints.values()
-        ]
-        return self.endpoints
+        )
 
     @property
     def base_url(self):
         """
-        get a random endpoint from self.endpointsget a random endpoint from
-        self.endpoints
+        get the next endpoint from self.endpoints
         """
-        return random.choice(self._resolve())
+        try:
+            return next(self.endpoints)
+        except StopIteration:
+            self._resolve()
+            return next(self.endpoints)
 
     @with_retry_connections()
     def request(self, method, endpoint, **kwargs):
         """
         Proxy to requests.request
-        :param method:
-        :param endpoint:
+        :param method: str formatted http method
+        :param endpoint: service endpoint
         :param kwargs: kwargs passed directly to requests.request
         :return:
         """
