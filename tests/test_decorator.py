@@ -2,7 +2,7 @@ import unittest
 import httpretty
 import requests
 
-from flask.ext.consulate import with_retry_connections, ConsulConnectionError
+from flask_consulate import with_retry_connections, ConsulConnectionError
 
 
 class TestDecorator(unittest.TestCase):

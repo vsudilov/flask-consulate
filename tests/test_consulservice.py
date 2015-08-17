@@ -1,7 +1,7 @@
 """
 Test ConsulService
 """
-from flask.ext.consulate import ConsulService
+from flask_consulate import ConsulService
 from unittest import TestCase, skip
 import mock
 
@@ -16,8 +16,11 @@ class TestConsulService(TestCase):
         """
         an initialized ConsulService object should parse the service URI
         """
-        cs = ConsulService('consul://tag.name.service')
+        cs = ConsulService('consul://tag.name.service', nameservers=['1'])
         self.assertEqual(cs.service, 'tag.name.service')
+        cs.resolver.nameservers = ['1']
+        with self.assertRaises(AssertionError):
+            ConsulService('http://')
 
 
     @skip("!! Test not implemented !!")

@@ -2,7 +2,7 @@ import os
 import unittest
 from httpretty import HTTPretty
 from flask import Flask
-from flask.ext.consulate import Consul
+from flask_consulate import Consul
 
 
 class MockConsulKV:

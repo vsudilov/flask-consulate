@@ -2,7 +2,7 @@ import unittest
 from flask import Flask
 import httpretty
 
-from flask.ext.consulate import Consul, ConsulConnectionError
+from flask_consulate import Consul, ConsulConnectionError
 
 
 class TestFlaskConsulate(unittest.TestCase):
