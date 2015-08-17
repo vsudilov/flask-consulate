@@ -11,6 +11,7 @@ from pip.req import parse_requirements
 import os
 if os.environ.get('USER', '') == 'vagrant':
     del os.link
+from flask_consulate import __version__
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
 reqs = parse_requirements('requirements.txt', session=PipSession())
@@ -21,7 +22,7 @@ reqs = [str(ir.req) for ir in reqs]
 
 setup(
     name='flask-consulate',
-    version='0.1.0',
+    version=__version__,
     url='http://github.com/adsabs/flask-consulate/',
     license='MIT',
     author='Vladimir Sudilovsky',
