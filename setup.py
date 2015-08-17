@@ -11,7 +11,7 @@ from pip.req import parse_requirements
 import os
 if os.environ.get('USER', '') == 'vagrant':
     del os.link
-from flask_consulate import __version__
+from _version import __version__
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
 reqs = parse_requirements('requirements.txt', session=PipSession())
