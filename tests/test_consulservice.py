@@ -28,28 +28,31 @@ class TestConsulService(TestCase):
         """
         pass
 
-    def test_baseurl(self):
+    @mock.patch('flask.ext.consulate.ConsulService._resolve')
+    def test_baseurl(self, mocked):
         """
-        the class property base_url should call _resolve() and return an
+        the class property base_url should call _resolve() and return the last
         element from that result list
         """
+        mocked.side_effect = lambda: ["addr-{}:80".format(i) for i in range(5)]
         cs = ConsulService("consul://")
-        cs.endpoints = ("addr-{}:80".format(i) for i in range(50))
         urls = [cs.base_url, cs.base_url, cs.base_url]
+        self.assertEqual(mocked.call_count, 3)
         self.assertEquals(
-            ["addr-0:80", "addr-1:80", "addr-2:80"],
+            ["addr-4:80", "addr-4:80", "addr-4:80"],
             urls
         )
 
+    @mock.patch('flask.ext.consulate.ConsulService._resolve')
     @mock.patch('flask.ext.consulate.requests.Session')
-    def test_request(self, mocked):
+    def test_request(self, mocked, mocked_resolve):
         """
         the ConsulService.request should be a thin wrapper around
         requests
         """
+        mocked_resolve.return_value = ["http://base_url:80/"]
         instance = mocked.return_value
         cs = ConsulService("consul://")
-        cs.endpoints = iter(("http://base_url:80/",))
         cs.get('/v1/status')
         instance.request.assert_called_with(
             'GET',

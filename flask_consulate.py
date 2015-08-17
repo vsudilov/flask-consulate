@@ -129,9 +129,8 @@ class ConsulService(object):
         # http://10.1.1.1:8001 and http://10.1.1.2:8002
     cs = ConsulService("consul://tag.FOO.service")
 
-        # Set the DNS nameserver to the IP address attached to network
-        #interface `docker0`
-    cs = ConsulService("consul://tag.FOO.server", discover_ns='docker0')
+        # Set the DNS nameserver to the default docker0 bridge ip
+    cs = ConsulService("consul://tag.FOO.server", nameservers=['172.17.42.1'])
 
         # returns a random choice from the DNS-advertised routes
         # in our case, either http://10.1.1.1:8001 or http://10.1.1.2:8002
@@ -155,7 +154,6 @@ class ConsulService(object):
         assert service_uri.startswith('consul://'), "Invalid consul service URI"
         self.service_uri = service_uri
         self.service = service_uri.replace('consul://', '')
-        self.endpoints = iter(())
         self.resolver = Resolver()
         self.session = requests.Session()
         if nameservers is not None:
@@ -174,22 +172,18 @@ class ConsulService(object):
         for rec in r.response.answer[0].items:
             name = '.'.join(rec.target.labels)
             endpoints[name]['port'] = rec.port
-        self.endpoints = (
+        return [
             "http://{ip}:{port}".format(
                 ip=v['addr'], port=v['port']
             ) for v in endpoints.values()
-        )
+        ]
 
     @property
     def base_url(self):
         """
         get the next endpoint from self.endpoints
         """
-        try:
-            return next(self.endpoints)
-        except StopIteration:
-            self._resolve()
-            return next(self.endpoints)
+        return self._resolve().pop()
 
     @with_retry_connections()
     def request(self, method, endpoint, **kwargs):
