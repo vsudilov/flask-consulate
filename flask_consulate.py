@@ -5,8 +5,8 @@ import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
 from urlparse import urljoin
-from _version import __version__
 
+__version__ = "0.1.1"
 
 class ConsulConnectionError(ConnectionError):
     """A connection error related to Consul occured"""
