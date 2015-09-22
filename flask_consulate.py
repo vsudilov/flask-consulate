@@ -51,6 +51,7 @@ class Consul(object):
         :param kwargs:
             consul_host: host to connect to, falling back to environmental
                         variable $CONSUL_HOST, then 'localhost'
+            consul_port: port, falling back to $CONSUL_PORT, then 8500
             max_tries: integer number of attempts to make to connect to
                         consul_host. Useful if the host is an alias for
                         the consul cluster
@@ -71,6 +72,8 @@ class Consul(object):
 
         self.host = self.kwargs.get('consul_host') or \
             os.environ.get('CONSUL_HOST', 'localhost')
+        self.port = self.kwargs.get('consul_port') or \
+            os.environ.get('CONSUL_PORT', 8500)
         self.max_tries = self.kwargs.get('max_tries', 3)
         self.session = self._create_session(
             test_connection=self.kwargs.get('test_connection', False),
@@ -87,7 +90,7 @@ class Consul(object):
         :type test_connection: bool
         :return consulate.Session instance
         """
-        session = consulate.Session(host=self.host)
+        session = consulate.Session(host=self.host, port=self.port)
         if test_connection:
             session.status.leader()
         return session

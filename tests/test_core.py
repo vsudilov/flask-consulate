@@ -45,11 +45,13 @@ class TestFlaskConsulate(unittest.TestCase):
 
         httpretty.register_uri(
             httpretty.GET,
-            "http://localhost:8500/v1/status/leader",
+            "http://consul.internal:8501/v1/status/leader",
             body="localhost:8300",
         )
         app = self.create_app()
-        consul = Consul(app, test_connection=True)
+        consul = Consul(
+            app, consul_host="consul.internal", consul_port="8501", test_connection=True
+        )
         self.assertIsNotNone(consul)
 
         httpretty.disable()
