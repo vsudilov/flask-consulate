@@ -1,6 +1,7 @@
 import unittest
 import httpretty
 import requests
+from requests.exceptions import ConnectionError
 
 from flask_consulate import with_retry_connections, ConsulConnectionError
 
@@ -19,13 +20,22 @@ class TestDecorator(unittest.TestCase):
         """
 
         urls = (
-            url for url in ['http://fake', 'http://fake', 'http://real.com']
+            url for url in ['http://fake.com', 'http://fake.com', 'http://real.com']
         )
 
         httpretty.register_uri(
             httpretty.GET,
             "http://real.com",
             body="OK"
+        )
+
+        def callback(*args, **kwargs):
+            raise ConnectionError
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://fake.com",
+            body=callback,
         )
 
         @with_retry_connections()
@@ -45,24 +55,19 @@ class TestDecorator(unittest.TestCase):
     def test_failing_retry_connections(self):
         """
         Test that the proper exception is raised after retrying and failing
-        after 3 times
         """
-        urls = (
-            url for url in ['http://fake', 'http://fake', 'http://fake']
-        )
 
         @with_retry_connections()
-        def GET_request(urls):
+        def GET_request():
             """
             This function will attempt to contact 3 urls: the first two
             should intentionally cause a ConnectionError, and the third
             will be caught by httpretty and serve a valid response
             """
-            u = urls.next()
-            return requests.get(u)
+            raise ConnectionError
 
         with self.assertRaises(ConsulConnectionError):
-            GET_request(urls)
+            GET_request()
 
 
 if __name__ == '__main__':

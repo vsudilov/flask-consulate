@@ -52,6 +52,7 @@ class Consul(object):
             consul_host: host to connect to, falling back to environmental
                         variable $CONSUL_HOST, then 'localhost'
             consul_port: port, falling back to $CONSUL_PORT, then 8500
+            healthcheck: healthcheck that will be registered
             max_tries: integer number of attempts to make to connect to
                         consul_host. Useful if the host is an alias for
                         the consul cluster
@@ -123,6 +124,15 @@ class Consul(object):
                 ns=namespace,
             )
             self.app.logger.debug(msg)
+
+    @with_retry_connections()
+    def register_service(self, **kwargs):
+        """
+        register this service with consul
+        kwargs passed to Consul.agent.service.register
+        """
+        kwargs.setdefault('name', self.app.name)
+        self.session.agent.service.register(**kwargs)
 
 
 class ConsulService(object):

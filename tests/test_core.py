@@ -3,7 +3,7 @@ from flask import Flask
 import httpretty
 
 from flask_consulate import Consul, ConsulConnectionError
-
+import mock
 
 class TestFlaskConsulate(unittest.TestCase):
     """
@@ -63,6 +63,25 @@ class TestFlaskConsulate(unittest.TestCase):
             lambda: Consul(app, test_connection=True),
         )
 
+    def test_register_service(self):
+        """
+        Service registration should call the underlying consulate register api
+        """
+        httpretty.enable()
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://consul.internal:8500/v1/status/leader",
+            body="localhost:8300",
+        )
+        app = self.create_app()
+        with mock.patch('consulate.Session') as mocked:
+            consul = Consul(app)
+            consul.register_service()
+            self.assertEqual(mocked.return_value.agent.service.register.call_count, 1)
+
+        httpretty.disable()
+        httpretty.reset()
 
 if __name__ == '__main__':
     unittest.main()
