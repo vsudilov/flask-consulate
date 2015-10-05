@@ -60,7 +60,7 @@ class TestFlaskConsulate(unittest.TestCase):
         app = self.create_app()
         self.assertRaises(
             ConsulConnectionError,
-            lambda: Consul(app, test_connection=True),
+            lambda: Consul(app, consul_host="consul.internal", consul_port="8501", test_connection=True),
         )
 
     def test_register_service(self):

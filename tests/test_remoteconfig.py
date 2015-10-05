@@ -73,6 +73,7 @@ class TestApplyRemoteConfig(unittest.TestCase):
         app.config.update({
             'cfg_1': 'local_1',
             'cfg_2': 'local_2',
+            'cfg_4': {'inner': 'value'},
         })
         return app
 
@@ -89,6 +90,7 @@ class TestApplyRemoteConfig(unittest.TestCase):
 
         self.assertEqual(app.config['cfg_1'], 'consul_1')
         self.assertEqual(app.config['cfg_3'], 'consul_3')
+        self.assertEqual(app.config['cfg_4'], {'inner': 'value'})
 
     def test_config_with_environ(self):
         """

@@ -27,7 +27,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'consulate==0.4.0',
+        'consulate',
         'Flask',
         'requests>=2.7.0',
         'dnspython',

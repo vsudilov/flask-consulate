@@ -2,6 +2,7 @@ import os
 import consulate
 import time
 import requests
+import json
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
 from urlparse import urljoin
@@ -117,7 +118,12 @@ class Consul(object):
 
         for k, v in self.session.kv.find(namespace).iteritems():
             k = k.replace(namespace, '')
-            self.app.config[k] = v
+            try:
+                self.app.config[k] = json.loads(v)
+            except (TypeError, ValueError):
+                self.app.logger.warning("Couldn't de-serialize {} to json, using raw value".format(v))
+                self.app.config[k] = v
+
             msg = "Set {k}={v} from consul kv '{ns}'".format(
                 k=k,
                 v=v,
