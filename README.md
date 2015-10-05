@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/adsabs/flask-consulate.svg?branch=master)](https://travis-ci.org/adsabs/flask-consulate)
-[![Coverage Status](https://coveralls.io/repos/adsabs/flask-consulate/badge.svg?branch=master&service=github)](https://coveralls.io/github/adsabs/flask-consulate?branch=master)
+[![Build Status](https://travis-ci.org/vsudilov/flask-consulate.svg?branch=master)](https://travis-ci.org/vsudilov/flask-consulate)
+[![Coverage Status](https://coveralls.io/repos/vsudilov/flask-consulate/badge.svg?branch=master&service=github)](https://coveralls.io/github/vsudilov/flask-consulate?branch=master)
 
 Flask-consulate
 ===
