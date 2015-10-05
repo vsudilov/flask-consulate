@@ -12,11 +12,11 @@ if os.environ.get('USER', '') == 'vagrant':
 
 setup(
     name='flask-consulate',
-    version="0.1.1",
-    url='http://github.com/adsabs/flask-consulate/',
+    version="0.1.2",
+    url='http://github.com/vsudilov/flask-consulate/',
     license='MIT',
     author='Vladimir Sudilovsky',
-    author_email='vsudilovsky@cfa.harvard.edu',
+    author_email='vsudilovsky@gmail.com',
     description='flask extension that provides an interface to consul via a flask app',
     long_description=__doc__,
     py_modules=['flask_consulate'],
