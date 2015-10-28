@@ -5,7 +5,7 @@ import requests
 import json
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 __version__ = "0.1.2"
 
@@ -28,7 +28,7 @@ def with_retry_connections(max_tries=3, sleep=0.05):
             while 1:
                 try:
                     return f(*args, **kwargs)
-                except (ConnectionError, ConnectTimeout), e:
+                except (ConnectionError, ConnectTimeout) as e:
                     tries += 1
                     if tries >= max_tries:
                         raise ConsulConnectionError(e)
