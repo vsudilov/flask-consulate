@@ -5,7 +5,7 @@ import requests
 import json
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
-from urllib.parse import urljoin
+from six.moves.urllib.parse import urljoin
 
 __version__ = "0.1.2"
 
