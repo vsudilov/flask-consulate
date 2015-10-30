@@ -7,8 +7,14 @@ flask extension that provides an interface to consul via a flask.app
 """
 from setuptools import setup
 import os
+import sys
 if os.environ.get('USER', '') == 'vagrant':
     del os.link
+
+if sys.version_info[0] == 2:
+    dnspython = "dnspython"
+elif sys.version_info[0] == 3:
+    dnspython = "dnspython3"
 
 setup(
     name='flask-consulate',
@@ -30,11 +36,12 @@ setup(
         'consulate',
         'Flask',
         'requests>=2.7.0',
-        'dnspython',
+        dnspython,
         'flask-testing',
         'httpretty',
         'mock',
         'nose',
+        'six',
         'coveralls'
     ],
     test_suite='tests',
@@ -44,6 +51,12 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]

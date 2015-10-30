@@ -5,7 +5,8 @@ import requests
 import json
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
-from urlparse import urljoin
+from six import iteritems
+from six.moves.urllib.parse import urljoin
 
 __version__ = "0.1.2"
 
@@ -28,7 +29,7 @@ def with_retry_connections(max_tries=3, sleep=0.05):
             while 1:
                 try:
                     return f(*args, **kwargs)
-                except (ConnectionError, ConnectTimeout), e:
+                except (ConnectionError, ConnectTimeout) as e:
                     tries += 1
                     if tries >= max_tries:
                         raise ConsulConnectionError(e)
@@ -116,7 +117,7 @@ class Consul(object):
                 environment=os.environ.get('ENVIRONMENT', 'generic_environment')
             )
 
-        for k, v in self.session.kv.find(namespace).iteritems():
+        for k, v in iteritems(self.session.kv.find(namespace)):
             k = k.replace(namespace, '')
             try:
                 self.app.config[k] = json.loads(v)
