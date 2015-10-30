@@ -2,9 +2,8 @@ import unittest
 import httpretty
 import requests
 from requests.exceptions import ConnectionError
-
 from flask_consulate import with_retry_connections, ConsulConnectionError
-
+from six import next
 
 class TestDecorator(unittest.TestCase):
     """
@@ -45,7 +44,7 @@ class TestDecorator(unittest.TestCase):
             should intentionally cause a ConnectionError, and the third
             will be caught by httpretty and serve a valid response
             """
-            u = urls.next()
+            u = next(urls)
             return requests.get(u)
 
         r = GET_request(urls)

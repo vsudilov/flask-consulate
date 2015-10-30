@@ -5,6 +5,7 @@ import requests
 import json
 from requests.exceptions import ConnectionError, ConnectTimeout
 from dns.resolver import Resolver
+from six import iteritems
 from six.moves.urllib.parse import urljoin
 
 __version__ = "0.1.2"
@@ -116,7 +117,7 @@ class Consul(object):
                 environment=os.environ.get('ENVIRONMENT', 'generic_environment')
             )
 
-        for k, v in self.session.kv.find(namespace).iteritems():
+        for k, v in iteritems(self.session.kv.find(namespace)):
             k = k.replace(namespace, '')
             try:
                 self.app.config[k] = json.loads(v)
