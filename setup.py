@@ -10,8 +10,6 @@ import sys
 
 from setuptools import setup, find_packages
 
-from flask_consulate import __version__
-
 
 # Dependencies:
 
@@ -45,8 +43,8 @@ SETUP_REQUIRES = [
 
 setup(
     name='flask-consulate',
-    version=__version__,
-    url='http://github.com/vsudilov/flask-consulate/',
+    version='0.2.0',
+    url='http://github.com/wemake-services/flask-consulate',
     license='MIT',
     author='Vladimir Sudilovsky',
     author_email='vsudilovsky@gmail.com',
