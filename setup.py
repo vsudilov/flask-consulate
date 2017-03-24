@@ -8,17 +8,34 @@ flask extension that provides an interface to consul via a flask.app
 from setuptools import setup
 import os
 import sys
+import re
 if os.environ.get('USER', '') == 'vagrant':
     del os.link
 
-if sys.version_info[0] == 2:
+major, minor1, minor2, release, serial =  sys.version_info
+
+if major == 2:
     dnspython = "dnspython"
-elif sys.version_info[0] == 3:
+elif major == 3:
     dnspython = "dnspython3"
+
+readfile_kwargs = {"encoding": "utf-8"} if major >= 3 else {}
+
+
+def readfile(filename):
+    with open(filename, **readfile_kwargs) as fp:
+        contents = fp.read()
+    return contents
+
+version_regex = re.compile("__version__ = \"(.*?)\"")
+contents = readfile(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "flask_consulate.py"))
+
+version = version_regex.findall(contents)[0]
 
 setup(
     name='flask-consulate',
-    version="0.1.2",
+    version=version,
     url='http://github.com/vsudilov/flask-consulate/',
     license='MIT',
     author='Vladimir Sudilovsky',
