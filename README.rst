@@ -24,8 +24,8 @@ Example
 This example shows several things: 
 
 1. how to register a ``Consul`` service
-2. implement a health-check
-3. receive configurration from ``Consul``'s KV-storage.
+2. how to implement a health-check
+3. how to receive configuration from ``Consul``'s KV-storage.
 
 .. code-block:: python
     
@@ -56,7 +56,7 @@ This example shows several things:
     consul.register_service(
         name='my-web-app',
         interval='10s',
-        tags=['webserver',],
+        tags=['webserver', ],
         port=5000,
         httpcheck='http://localhost:5000/healthcheck'
     )
