@@ -1,9 +1,14 @@
-import unittest
-from flask import Flask
-import httpretty
+# coding: utf-8
 
-from flask_consulate import Consul, ConsulConnectionError
+import unittest
+import httpretty
 import mock
+
+from flask import Flask
+
+from flask_consulate import Consul
+from flask_consulate.exceptions import ConsulConnectionError
+
 
 class TestFlaskConsulate(unittest.TestCase):
     """
@@ -45,12 +50,15 @@ class TestFlaskConsulate(unittest.TestCase):
 
         httpretty.register_uri(
             httpretty.GET,
-            "http://consul.internal:8501/v1/status/leader",
+            'http://consul.internal:8501/v1/status/leader',
             body="localhost:8300",
         )
         app = self.create_app()
         consul = Consul(
-            app, consul_host="consul.internal", consul_port="8501", test_connection=True
+            app,
+            consul_host='consul.internal',
+            consul_port='8501',
+            test_connection=True
         )
         self.assertIsNotNone(consul)
 
@@ -60,7 +68,12 @@ class TestFlaskConsulate(unittest.TestCase):
         app = self.create_app()
         self.assertRaises(
             ConsulConnectionError,
-            lambda: Consul(app, consul_host="consul.internal", consul_port="8501", test_connection=True),
+            lambda: Consul(
+                app,
+                consul_host='consul.internal',
+                consul_port='8501',
+                test_connection=True
+            ),
         )
 
     def test_register_service(self):
@@ -71,7 +84,7 @@ class TestFlaskConsulate(unittest.TestCase):
 
         httpretty.register_uri(
             httpretty.GET,
-            "http://consul.internal:8500/v1/status/leader",
+            'http://consul.internal:8500/v1/status/leader',
             body="localhost:8300",
         )
         app = self.create_app()
@@ -82,7 +95,3 @@ class TestFlaskConsulate(unittest.TestCase):
 
         httpretty.disable()
         httpretty.reset()
-
-if __name__ == '__main__':
-    unittest.main()
-

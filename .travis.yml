@@ -1,8 +1,30 @@
-language: python
-python:
-- "2.7"
-- "3.4"
-script: nosetests --with-coverage
 sudo: false
+language: python
+
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - python3.5
+
+python:
+  - 3.6
+
+env:
+  - TOX_ENV=py27
+  - TOX_ENV=py34
+  - TOX_ENV=py35
+  - TOX_ENV=py36
+
+install: pip install tox
+
+script: tox -e $TOX_ENV
+
 after_success:
  - coveralls
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
