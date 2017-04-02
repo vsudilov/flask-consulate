@@ -30,6 +30,7 @@ INSTALL_REQUIRES = [
 TESTS_REQUIRE = [
     'pytest',
     'pytest-cov',
+    'nose',
     'httpretty',
     'mock',
     'six',

@@ -1,23 +1,14 @@
 sudo: false
 language: python
-addons:
-  apt:
-    sources:
-    - deadsnakes
-    packages:
-    - python3.5
 python:
-- 3.6
-env:
-- TOX_ENV=py27
-- TOX_ENV=py34
-- TOX_ENV=py35
-- TOX_ENV=py36
-- TOX_ENV=cover
-install: pip install tox
-script: tox -e $TOX_ENV
-after_success:
-- coveralls
+  - 3.4
+  - 3.5
+  - 3.6
+  - 2.7
+install: 
+  - python setup.py install
+script: python setup.py nosetests
+after_success: coveralls
 notifications:
   email:
     on_success: never
@@ -33,4 +24,3 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: vsudilov/flask-consulate
-    condition: "${TOX_ENV} == 'cover'" # deploy only once
