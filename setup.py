@@ -28,13 +28,12 @@ INSTALL_REQUIRES = [
 ]
 
 TESTS_REQUIRE = [
-    'pytest',
-    'pytest-cov',
-    'nose',
     'httpretty',
     'mock',
     'six',
     'coveralls',
+    'pytest-cov',
+    'pytest',
 ]
 
 SETUP_REQUIRES = [

@@ -7,7 +7,7 @@ python:
   - 2.7
 install: 
   - python setup.py install
-script: python setup.py nosetests
+script: python setup.py test
 after_success: coveralls
 notifications:
   email:
