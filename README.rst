@@ -2,11 +2,11 @@
 flask-consulate
 ===============
 
-.. image:: https://travis-ci.org/wemake-services/flask-consulate.svg?branch=master
-   :target: https://travis-ci.org/wemake-services/flask-consulate
+.. image:: https://travis-ci.org/vsudilov/flask-consulate.svg?branch=master
+   :target: https://travis-ci.org/vsudilov/flask-consulate
 
-.. image:: https://coveralls.io/repos/wemake-services/flask-consulate/badge.svg?branch=master
-   :target: https://coveralls.io/github/wemake-services/flask-consulate?branch=master
+.. image:: https://coveralls.io/repos/vsudilov/flask-consulate/badge.svg?branch=master
+   :target: https://coveralls.io/github/vsudilov/flask-consulate?branch=master
 
 Synopsis
 ========
