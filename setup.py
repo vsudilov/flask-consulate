@@ -32,7 +32,7 @@ TESTS_REQUIRE = [
     'mock',
     'six',
     'coveralls',
-    'pytest-cov',
+    'coverage',
     'pytest',
 ]
 

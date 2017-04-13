@@ -2,3 +2,5 @@
 omit = 
     */python?.?/*
     */site-packages/*
+    *.eggs/*
+    setup.py
