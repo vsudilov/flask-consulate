@@ -1,11 +1,6 @@
-[run]
-omit =
-    */python?.?/*
-    */lib-python/?.?/*.py
-    */lib_pypy/_*.py
-    */site-packages/nose/*
-    */unittest2/*
 [report]
-exclude_lines =
-    # Have to re-enable the standard pragma
-    pragma: no cover
+omit = 
+    */python?.?/*
+    */site-packages/*
+    *.eggs/*
+    setup.py

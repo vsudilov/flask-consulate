@@ -1,0 +1,2 @@
+recursive-include flask_consulate *.py
+include LICENSE.txt README.rst

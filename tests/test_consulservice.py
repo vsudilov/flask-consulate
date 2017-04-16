@@ -1,9 +1,10 @@
-"""
-Test ConsulService
-"""
-from flask_consulate import ConsulService
-from unittest import TestCase, skip
+# coding: utf-8
+
 import mock
+
+from unittest import TestCase, skip
+
+from flask_consulate import ConsulService
 
 
 class TestConsulService(TestCase):
@@ -22,8 +23,7 @@ class TestConsulService(TestCase):
         with self.assertRaises(AssertionError):
             ConsulService('http://')
 
-
-    @skip("!! Test not implemented !!")
+    @skip('!! Test not implemented !!')
     def test_resolve(self):
         """
         resolve() should return a list of string formatted service endpoints
@@ -31,38 +31,34 @@ class TestConsulService(TestCase):
         """
         pass
 
-    @mock.patch('flask.ext.consulate.ConsulService._resolve')
+    @mock.patch('flask_consulate.ConsulService._resolve')
     def test_baseurl(self, mocked):
         """
         the class property base_url should call _resolve() and return the last
         element from that result list
         """
-        mocked.side_effect = lambda: ["addr-{}:80".format(i) for i in range(5)]
-        cs = ConsulService("consul://")
+        mocked.side_effect = lambda: ['addr-{}:80'.format(i) for i in range(5)]
+        cs = ConsulService('consul://')
         urls = [cs.base_url, cs.base_url, cs.base_url]
         self.assertEqual(mocked.call_count, 3)
         self.assertEquals(
-            ["addr-4:80", "addr-4:80", "addr-4:80"],
+            ['addr-4:80', 'addr-4:80', 'addr-4:80'],
             urls
         )
 
-    @mock.patch('flask.ext.consulate.ConsulService._resolve')
-    @mock.patch('flask.ext.consulate.requests.Session')
+    @mock.patch('flask_consulate.ConsulService._resolve')
+    @mock.patch('flask_consulate.service.requests.Session')
     def test_request(self, mocked, mocked_resolve):
         """
         the ConsulService.request should be a thin wrapper around
         requests
         """
-        mocked_resolve.return_value = ["http://base_url:80/"]
+        mocked_resolve.return_value = ['http://base_url:80/']
         instance = mocked.return_value
-        cs = ConsulService("consul://")
+        cs = ConsulService('consul://')
         cs.get('/v1/status')
         instance.request.assert_called_with(
             'GET',
             'http://base_url:80/v1/status',
             timeout=(1, 30),
         )
-
-
-
-

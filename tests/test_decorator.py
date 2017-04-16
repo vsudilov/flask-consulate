@@ -1,9 +1,15 @@
+# coding: utf-8
+
 import unittest
 import httpretty
 import requests
+
 from requests.exceptions import ConnectionError
-from flask_consulate import with_retry_connections, ConsulConnectionError
 from six import next
+
+from flask_consulate.decorators import with_retry_connections
+from flask_consulate.exceptions import ConsulConnectionError
+
 
 class TestDecorator(unittest.TestCase):
     """
@@ -18,13 +24,15 @@ class TestDecorator(unittest.TestCase):
         default maximum of 3 times before giving up
         """
 
-        urls = (
-            url for url in ['http://fake.com', 'http://fake.com', 'http://real.com']
-        )
+        urls = (url for url in [
+            'http://fake.com',
+            'http://fake.com',
+            'http://real.com',
+        ])
 
         httpretty.register_uri(
             httpretty.GET,
-            "http://real.com",
+            'http://real.com',
             body="OK"
         )
 
@@ -67,7 +75,3 @@ class TestDecorator(unittest.TestCase):
 
         with self.assertRaises(ConsulConnectionError):
             GET_request()
-
-
-if __name__ == '__main__':
-    unittest.main()

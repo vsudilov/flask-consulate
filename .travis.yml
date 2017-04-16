@@ -1,8 +1,27 @@
+sudo: false
 language: python
 python:
-- "2.7"
-- "3.4"
-script: nosetests --with-coverage
-sudo: false
-after_success:
- - coveralls
+  - 3.4
+  - 3.5
+  - 3.6
+  - 2.7
+install: 
+  - pip install coverage coveralls
+  - python setup.py install
+script: coverage run setup.py test
+after_success: coveralls
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+deploy:
+  provider: pypi
+  user: vsudilov
+  password:
+    secure: d6PmXuWKKlJyT37Yc3VL29MgxxVNCzIqifxatLGWJahEtFzQmx1pcREOItzDvoSVq67j8gsLRtnXDNUqozWegRQLGKBG52H5+8AhRYM/2X/ROc3R8JquTus+kfSFmAUUK5ZsLYsPjZQzp95/J4J0q8FqxPqkOOK0c6SAgzsyq5D2UzYhTC6sSyPKRhJ/WT638HpQKmA8TUweXfjD26oR9fVW+QYWcV9ZJKa6hlBVNE0h+kaWc9a/ZnlOGgZE8FMedC/G90ujcaOddxkDy6ysEY3BksAOOpoymvvnCFGbZFfu4qg32TEIq72UOt0Bs99EQTLn5G2qsYqqPVjrokBd9KUhi2wlCpM7oL8v11TLga6m4WfoGnXZ6GCdMgM3YCq76UhCKQT71AA7uHRNEDIrbgvGq5lOqjJvvBxuDnss3zEXmXTQvTOM8IIBM2rTU0/eOe3X/vdmDOorOvbJU38HvWlWvWCR2U2QEkgteQuQtf34K6R+wfsx+WR8rrcfqMz7+qK4p95LABskT/ZDPn7z7fHexkOIjplIHcgTh7t2OJFZ6ddXO/LwvwjWTXgo8ims2MT7rq3avmBMMrLOGuIW33Iq6j59/aILUnssqWO7Lc7hZ+rBlgIe9y2eh1/vZ1QYy2+JhmPNP6mX/OcPplLosJPJbqKtOxyHI+2wB8t9ts8=
+  on:
+    branch: master
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: vsudilov/flask-consulate

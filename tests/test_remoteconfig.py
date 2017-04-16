@@ -1,13 +1,17 @@
+# coding: utf-8
+
 import os
 import unittest
+
 from httpretty import HTTPretty
 from flask import Flask
+
 from flask_consulate import Consul
 
 
 class MockConsulKV:
     """
-    context manager that mocks a consul KV response
+    Context manager that mocks a consul KV response.
     """
 
     def __enter__(self):
@@ -113,7 +117,3 @@ class TestApplyRemoteConfig(unittest.TestCase):
 
         self.assertEqual(app.config['cfg_1'], 'consul_1')
         self.assertEqual(app.config['cfg_3'], 'consul_3')
-
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
