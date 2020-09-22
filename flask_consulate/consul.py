@@ -98,15 +98,10 @@ class Consul(object):
             try:
                 self.app.config[k] = json.loads(v)
             except (TypeError, ValueError):
-                self.app.logger.warning("Couldn't de-serialize {} to json, using raw value".format(v))
+                self.app.logger.warning("Couldn't de-serialize %r to json, using raw value", v)
                 self.app.config[k] = v
 
-            msg = "Set {k}={v} from consul kv '{ns}'".format(
-                k=k,
-                v=v,
-                ns=namespace,
-            )
-            self.app.logger.debug(msg)
+            self.app.logger.debug("Set %s=%s from consul kv %r", k, v, namespace)
 
     @with_retry_connections()
     def register_service(self, **kwargs):
