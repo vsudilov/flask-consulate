@@ -24,13 +24,13 @@ INSTALL_REQUIRES = [
     'consulate',
     'Flask',
     'requests>=2.7.0',
+    'six',
     dnspython,
 ]
 
 TESTS_REQUIRE = [
     'httpretty',
     'mock',
-    'six',
     'coveralls',
     'coverage',
     'pytest',
